@@ -26,7 +26,7 @@ categories: javascript
 
 ### 知识储备
 
-Promises/A+ 规范：
+[Promises/A+ 规范](https://www.ituring.com.cn/article/66566)
 
 #### 术语
 
