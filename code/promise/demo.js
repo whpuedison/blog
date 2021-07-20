@@ -1,26 +1,24 @@
 const { resolve } = require("./promise");
 const Promise = require("./promise");
-
+const fs = require('fs')
+const path = require('path')
+const filePath = path.resolve(__dirname, 'text1.js');
 const p1 = new Promise((resolve, reject) => {
-    const value = 1
-    setTimeout(() => {
-        if (value) {
-            resolve(value)
-        } else {
-            reject(value)
+    fs.readFile(filePath, function (err, data) {
+        if (err) {
+            reject('errMsg')
+            return
         }
-    }, 1000)
-    // if (value) {
-    //     resolve(value)
-    // } else {
-    //     reject(value)
-    // }
+        resolve(data.toString())
+     })
 })
-p1.then().then(res=> {
-    console.log('res1111', res)
-    return res
-})
-// p1.then(res => {
+// p1.then().then(res=> {
+//     console.log('res', res)
 //     return res
 // })
+p1.then(res => {
+    console.log(res)
+}, err => {
+    console.error(err)
+})
 // console.log(p2)

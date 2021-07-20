@@ -68,7 +68,6 @@ function resolvePromise(promise2,x,resolve,reject){
           console.log(2222)
           this.status = 'resolve'
           //监听回调函数(如果data是promise，则上一个的会等待这个data执行了这个rv方法之后在执行，它本身的成功回调)
-          console.log(this.onResolvedCallbacks[0].toString())
           this.onResolvedCallbacks.forEach(fn=>fn())
         }
       }
@@ -106,8 +105,6 @@ function resolvePromise(promise2,x,resolve,reject){
       //因为错误的值要让后面访问到，所以这里也要跑出个错误，不然会在之后then的resolve中捕获
       onRejected = typeof onRejected === 'function'?onRejected:err=>{ throw err ;}
       //声明一个promise对象
-      console.log(onFufilled.toString())
-      console.log(onRejected.toString())
       let promise2
       console.log('this.status', this.status)
       if(this.status === 'resolve'){
