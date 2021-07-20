@@ -1,6 +1,6 @@
 ---
 
-title: Promise三部曲之是什么
+title: 认识一下Promise
 
 tags: [Promise]
 
