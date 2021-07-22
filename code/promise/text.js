@@ -42,7 +42,7 @@ class Promise {
 
     then (onResolve, onReject) {
         onResolve = typeof onResolve === 'function' ? onResolve : res => res
-        onReject = typeof onReject === 'function' ? onResolve : err => { throw err }
+        onReject = typeof onReject === 'function' ? onReject : err => { throw err }
         const _this = this
         return new Promise((resolve, reject) => {
             // 三种情况：
@@ -85,6 +85,14 @@ class Promise {
             }
         })
     }
+
+    catch (onReject) {
+        return this.then(undefined, onReject)
+    }
+
+    // static resolve () {
+
+    // }
 }
 
 module.exports = Promise
