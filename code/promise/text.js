@@ -90,9 +90,21 @@ class Promise {
         return this.then(undefined, onReject)
     }
 
-    // static resolve () {
+    static resolve (value) {
+        return new Promise((resolve, reject) => {
+            if (value instanceof Promise) {
+                value.then(resolve, reject)
+            } else {
+                resolve(value)
+            }
+        })
+    }
 
-    // }
+    static reject (value) {
+        return new Promise((resolve, reject) => {
+            reject(value)
+        })
+    }
 }
 
 module.exports = Promise

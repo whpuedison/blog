@@ -1,6 +1,6 @@
 // const Promise = require("./promise");
 const fs = require('fs')
-const path = require('path')
+const path = require('path');
 const filePath = path.resolve(__dirname, 'text1.js');
 const Promise = require('./text')
 
@@ -28,9 +28,9 @@ const p1 = new Promise((resolve, reject) => {
 //     return 'ERROR ERROR'
 //     // return new Promise((resolve, reject) => { throw 'EEE' })
 // })
-const p2 = p1.catch(err => {
-    console.log(err)
-})
+// const p2 = p1.catch(err => {
+//     console.log(err)
+// })
 // setTimeout(() => {
 //     console.log(p2)
 // }, 1000)
@@ -41,4 +41,18 @@ const p2 = p1.catch(err => {
 // })
 // setTimeout(() => {
 //     console.log(p1)
+// }, 1000)
+// const p2 = Promise.resolve(1)
+// const p3 = Promise.resolve(new Promise((resolve, reject) => { resolve('Yes') }))
+// const p4 = Promise.resolve(new Promise((resolve, reject) => { reject('No') }))
+// const p5 = Promise.resolve(new Promise((resolve, reject) => { throw 'what up' }))
+// const p6 = Promise.reject('1')
+// const p7 = Promise.reject(new Promise((resolve, reject) => { resolve('Yes')}))
+// setTimeout(() => {
+    // console.log(p2)
+    // console.log(p3)
+    // console.log(p4)
+    // console.log(p5)
+    // console.log(p6)
+    // console.log(p7)
 // }, 1000)
