@@ -6,4 +6,3 @@ tags: [Promise]
 categories: javascript
 ---
 
-没问题
