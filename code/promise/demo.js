@@ -2,7 +2,7 @@
 const fs = require('fs')
 const path = require('path');
 const filePath = path.resolve(__dirname, 'text1.js');
-const Promise = require('./text')
+const Promise = require('./text2')
 
 const p1 = new Promise((resolve, reject) => {
     // fs.readFile(filePath, function (err, data) {

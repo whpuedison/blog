@@ -1,5 +1,5 @@
 ---
-title: Promise到底解决了什么问题
+title: 手写一个Promise
 
 tags: [Promise]
 
