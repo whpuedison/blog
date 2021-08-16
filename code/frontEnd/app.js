@@ -1,13 +1,13 @@
 const express = require('express')
 const path = require('path')
-const { createProxyMiddleware } = require('http-proxy-middleware')
+const proxy = require('http-proxy-middleware')
 
 const app = express()
 
 app.use(express.static('public'));
 
 // 解决跨域：开发环境前端服务通过proxy做代理转发请求
-app.use('*', createProxyMiddleware({ target: 'http://192.168.31.186:3000', changeOrigin: true }));
+app.use('*', proxy({ target: 'http://192.168.31.186:3000', changeOrigin: true }));
 
 function onError(error) {
     if (error.syscall !== 'listen') {
