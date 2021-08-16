@@ -7,7 +7,8 @@ const app = express()
 app.use(express.static('public'));
 
 // 解决跨域：开发环境前端服务通过proxy做代理转发请求
-app.use('*', proxy({ target: 'http://192.168.31.186:3000', changeOrigin: true }));
+app.use('*', proxy({ target: 'http://192.168.191.2:3000', changeOrigin: true })); // office-url
+// app.use('*', proxy({ target: 'http://192.168.31.186:3000', changeOrigin: true })); // home-url
 
 function onError(error) {
     if (error.syscall !== 'listen') {
