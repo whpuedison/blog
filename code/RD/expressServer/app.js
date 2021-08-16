@@ -26,6 +26,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 //   next()
 // });
 
+// 设置cookie
+// app.use((req, res, next) => {
+//   res.header('Set-Cookie', 'SESSION=4DzFhID9r5Ak8ko1Ur-GOX;Path=/');
+//   next()
+// })
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/files', filesRouter);

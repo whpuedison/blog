@@ -7,7 +7,12 @@ const getReq = (url) => {
             method: 'get',
             url: `${ApiRoot}${url}`,
             success (res) {
-                resolve(res)
+                const { code, data, msg } = res || {}
+                if (code) {
+                    resolve(data)
+                } else {
+                    reject(msg)
+                }
             },
             error (e) {
                 reject(e)
