@@ -8,6 +8,25 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     filename: 'main.bundle.js',
   },
+
+  module: {
+    rules: [ 
+      { 
+        test: /\.js$/, 
+        use: { 
+          loader: 'babelParse.js', 
+          options: { 
+            presets: ['@babel/preset-env'] 
+          } 
+        }
+      }
+    ]
+  },
+  resolveLoader: {
+    // 寻找loader所在位置
+    modules: ['node_modules', path.resolve(__dirname, 'loaders/')]
+  },
+
   plugins: [
       new CleanWebpackPlugin(),
       new HtmlWebpackPlugin({
@@ -15,6 +34,7 @@ module.exports = {
         inject: 'body'
       }),
   ],
+
   devtool: 'inline-source-map',
   devServer: {
     // host: '192.168.31.186', // home-host
