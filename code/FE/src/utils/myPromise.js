@@ -1,5 +1,3 @@
-import { reject, resolve } from "../../text2"
-
 class Promise {
     constructor (execute) {
         /**
