@@ -124,8 +124,8 @@ class Promise {
         })
     }
 
-    catch () {
-
+    catch (onReject) {
+        return this.then(null, onReject)
     }
 
     static resolve () {
