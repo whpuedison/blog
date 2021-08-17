@@ -4,7 +4,6 @@
   "description": "",
   "main": "demo.js",
   "scripts": {
-    "dev-local": "nodemon ./app.js",
     "dev": "webpack-dev-server --mode development",
     "build": "webpack --mode production"
   },

@@ -1,2 +1,2 @@
 // 测试Promise
-require('./feature/testPromis.js')
+require('./features/testPromis.js')

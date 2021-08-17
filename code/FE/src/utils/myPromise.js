@@ -165,7 +165,6 @@ class Promise {
                 Promise.resolve(promises[i]).then(res => {
                     count++
                     values[i] = res
-                    console.log('count', count)
                     if (count === promises.length) {
                         resolve(values)
                     }
