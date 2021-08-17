@@ -1,4 +1,4 @@
-
+import Promise from '../utils/myPromise.js'
 
 // 同步：
 
@@ -113,13 +113,13 @@ const p4 = new Promise((resolve) => {
     setTimeout(() => { resolve('async OK') }, 500)
 })
 console.log('p4', p4)
-// ES6: pedding -> [[PromiseState]]: "fulfilled", [[PromiseResult]]: "async OK"
+// ES6: pending -> [[PromiseState]]: "fulfilled", [[PromiseResult]]: "async OK"
 // self: 
 const p4_then_res = p4.then(res => { console.log('p4_res', res) })
 // ES6:  p4_res async OK
 // self: 
 console.log('p4_then_res', p4_then_res)
-// ES6:  [[PromiseState]]: "fulfilled", [[PromiseResult]]: undefined
+// ES6: pending -> [[PromiseState]]: "fulfilled", [[PromiseResult]]: undefined
 // self: 
 const p4_then_res1 = p4.then(res => { console.log('p4_res1', res) })
 // ES6:  p4_res1 sync OK
@@ -130,19 +130,19 @@ const p4_then_res4 = p4.then(() => new Promise((resolve) => resolve('p4 then pro
 const p4_then_res5 = p4.then(() => new Promise((resolve, reject) => reject('p4 then promise reject')))
 
 console.log('p4_then_res1', p4_then_res1)
-// ES6:  [[PromiseState]]: "fulfilled", [[PromiseResult]]: undefined
+// ES6: pending -> [[PromiseState]]: "fulfilled", [[PromiseResult]]: undefined
 // self: 
 console.log('p4_then_res2', p4_then_res2)
-// ES6:  [[PromiseState]]: "fulfilled", [[PromiseResult]]: "p4 then resolve ok"
+// ES6: pending -> [[PromiseState]]: "fulfilled", [[PromiseResult]]: "p4 then resolve ok"
 // self: 
 console.log('p4_then_res3', p4_then_res3)
-// ES6:  [[PromiseState]]: "rejected", [[PromiseResult]]: "p4 then throw error"
+// ES6: pending -> [[PromiseState]]: "rejected", [[PromiseResult]]: "p4 then throw error"
 // self: 
 console.log('p4_then_res4', p4_then_res4)
-// ES6:  [[PromiseState]]: "fulfilled", [[PromiseResult]]: "p4 then promise resolve"
+// ES6: pending -> [[PromiseState]]: "fulfilled", [[PromiseResult]]: "p4 then promise resolve"
 // self: 
 console.log('p4_then_res5', p4_then_res5)
-// ES6:  [[PromiseState]]: "rejected", [[PromiseResult]]: "p4 then promise reject"
+// ES6: pending -> [[PromiseState]]: "rejected", [[PromiseResult]]: "p4 then promise reject"
 // self: 
 
 
@@ -152,13 +152,13 @@ const p5 = new Promise((resolve, reject) => {
     setTimeout(() => { reject('async ERROR') }, 500)
 })
 console.log('p5', p5) 
-// ES6: pedding -> [[PromiseState]]: "rejected", [[PromiseResult]]: "async ERROR"
+// ES6: pending -> [[PromiseState]]: "rejected", [[PromiseResult]]: "async ERROR"
 // self: 
 const p5_catch_err = p5.catch(err => { console.log('p5_err', err) })
-// ES6:  [[PromiseState]]: "fulfilled", [[PromiseResult]]: undefined
+// ES6: p5_catch_err async ERROR
 // self: 
 console.log('p5_catch_err', p5_catch_err)
-// ES6:  p5_catch_err async ERROR
+// ES6: pending -> [[PromiseState]]: "fulfilled", [[PromiseResult]]: undefined
 // self: 
 const p5_then_res1 = p5.catch(res => { console.log('p5_res1', res) })
 // ES6:  p5_res1 sync ERROR
@@ -168,19 +168,19 @@ const p5_then_res3 = p5.catch(() => { throw "p5 then throw error" })
 const p5_then_res4 = p5.catch(() => new Promise((resolve) => resolve('p5 then promise resolve')))
 const p5_then_res5 = p5.catch(() => new Promise((resolve, reject) => reject('p5 then promise reject')))
 console.log('p5_then_res1', p5_then_res1)
-// ES6:  [[PromiseState]]: "fulfilled", [[PromiseResult]]: undefined
+// ES6: pending -> [[PromiseState]]: "fulfilled", [[PromiseResult]]: undefined
 // self: 
 console.log('p5_then_res2', p5_then_res2)
-// ES6:  [[PromiseState]]: "fulfilled", [[PromiseResult]]: "p5 then resolve ok"
+// ES6: pending -> [[PromiseState]]: "fulfilled", [[PromiseResult]]: "p5 then resolve ok"
 // self:
 console.log('p5_then_res3', p5_then_res3)
-// ES6:  [[PromiseState]]: "rejected", [[PromiseResult]]: "p5 then throw error"
+// ES6: pending -> [[PromiseState]]: "rejected", [[PromiseResult]]: "p5 then throw error"
 // self:
 console.log('p5_then_res4', p5_then_res4)
-// ES6:  [[PromiseState]]: "fulfilled", [[PromiseResult]]: "p5 then promise resolve"
+// ES6: pending -> [[PromiseState]]: "fulfilled", [[PromiseResult]]: "p5 then promise resolve"
 // self:
 console.log('p5_then_res5', p5_then_res5)
-// ES6:  [[PromiseState]]: "rejected", [[PromiseResult]]: "p5 then promise reject"
+// ES6: pending -> [[PromiseState]]: "rejected", [[PromiseResult]]: "p5 then promise reject"
 // self:
 
 
