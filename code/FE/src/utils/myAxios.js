@@ -1,3 +1,5 @@
+require('./jquery.min.js')
+
 import { ApiRoot } from '../config/index.js'
 // import Promise from './myPromise.js'
 

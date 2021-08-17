@@ -192,6 +192,8 @@ console.log('p6', p6)
 // self: ✅ 
 // 状态为pendding, then方法无法执行
 
+
+
 /* test7: 测试异常穿透 */
 const p7 = new Promise((resolve, reject) => {
     throw '异常穿透Error'
@@ -199,6 +201,8 @@ const p7 = new Promise((resolve, reject) => {
 p7.then(() => 'step1').then(() => 'step2').then(() => 'step3').catch(e => { console.log('p7', e) })
 // ES6: '异常穿透Error'
 // self: ✅ 
+
+
 
 /* test8: 测试then方法链式调用 */
 const p8 = new Promise((resolve, reject) => {
@@ -216,6 +220,63 @@ p8.then((res) => {
 }).catch(e => { console.log('p8', e) })
 // ES6:  1 2 3
 // self: ✅ 
+
+
+
+/* test9: 测试Promise.resolve() */
+const p9_1 = Promise.resolve('p9_1')
+const p9_2 = Promise.resolve(new Promise((resolve) => {resolve('p9_2')}))
+const p9_3 = Promise.resolve(new Promise((resolve, reject) => {reject('p9_3')}))
+console.log('p9_1', p9_1)
+// ES6:  [[PromiseState]]: "fulfilled", [[PromiseResult]]: "p9_1"
+// self: ✅ 
+console.log('p9_2', p9_2)
+// ES6:  [[PromiseState]]: "fulfilled", [[PromiseResult]]: "p9_2"
+// self: ✅ 
+console.log('p9_3', p9_3)
+// ES6:  [[PromiseState]]: "rejected", [[PromiseResult]]: "p9_3"
+// self: ✅ 
+
+
+
+/* test10: 测试Promise.reject() */
+const p10_1 = Promise.reject('p10_1')
+const p10_2 = Promise.reject(new Promise((resolve) => {resolve('p10_2')}))
+const p10_3 = Promise.reject(new Promise((resolve, reject) => {reject('p10_3')}))
+console.log('p10_1', p10_1)
+// ES6:  [[PromiseState]]: "rejected", [[PromiseResult]]: "p10_1"
+// self: ✅ 
+console.log('p10_2', p10_2)
+// ES6:  [[PromiseState]]: "rejected", [[PromiseResult]]: Promise
+// self: ✅ 
+console.log('p10_3', p10_3)
+// ES6:  [[PromiseState]]: "rejected", [[PromiseResult]]: Promise
+// self: ✅ 
+
+
+
+/* test11: 测试Promise.all() */
+const p11_1 = Promise.all([p1, p4, p8])
+const p11_2 = Promise.all([p1, p2, p4])
+console.log('p11_1', p11_1)
+// ES6:  [[PromiseState]]: "fulfilled", [[PromiseResult]]: ['sync OK', 'async OK', 1]
+// self: ✅
+p11_2.catch(e => console.log('p11_2', p11_2))
+// ES6:  [[PromiseState]]: "rejected", [[PromiseResult]]: "sync ERROR"
+// self: ✅
+
+/* test12: 测试Promise.race() */
+const p12_1 = Promise.race([p1, p2])
+const p12_2 = Promise.race([p2, p1])
+console.log('p12_1', p12_1)
+// ES6:  [[PromiseState]]: "fulfilled", [[PromiseResult]]: "sync OK"
+// self: ✅
+p12_2.catch(e => console.log('p12_2', p11_2))
+// ES6:  [[PromiseState]]: "rejected", [[PromiseResult]]: "sync ERROR"
+// self: ✅
+
+
+
 
 
 

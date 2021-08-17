@@ -3,8 +3,8 @@ import { reject, resolve } from "../../text2"
 class Promise {
     constructor (execute) {
         /**
-         *  Promise实例状态值（3种）: 1.pending; 2.resolved; 3.rejected。
-         *  状态改变方式（2种）：1.pending -> resolved; 2.pending -> resolved。
+         *  Promise实例状态值（3种）: 1.pending; 2.fulfilled; 3.rejected。
+         *  状态改变方式（2种）：1.pending -> fulfilled; 2.pending -> fulfilled。
          *  注意：一旦状态改变，不可逆。
          */
         this.PromiseState = 'pending'
@@ -21,13 +21,13 @@ class Promise {
         /**
          * 使用方式：在Promise执行函数中，将成功的值作为参数调用resolve函数
          * 执行函数里的内置方法，主要作用有三个：
-         * 1.改变Promise实例状态： pending -> resolved；
+         * 1.改变Promise实例状态： pending -> fulfilled；
          * 2.改变Promise实例结果： this.PromiseState = data；
          * 3.实现Promise的状态不可逆，具体做法是只当状态为pending时才改变状态和结果。
          */
         const resolve = (data) => {
             if (this.PromiseState !== 'pending') return
-            this.PromiseState = 'resolved'
+            this.PromiseState = 'fulfilled'
             this.PromiseResult = data
             // Promise的then方法是异步执行的，回调函数执行放在定时器里面来实现。
             setTimeout(() => { this.callBacks.forEach(item => item.onResolve())}, 0)
@@ -65,7 +65,7 @@ class Promise {
          * 4.回调函数返回值不同，分三种情况：
          *   *抛出异常，状态为失败，结果为失败返回的拒因；
          *   *返回结果不是Promise实例，状态为成功，结果为成功返回的终值；
-         *   *返回结果是Promise实例，结果为这个Promise的结果。
+         *   *返回结果是Promise实例，返回为这个Promise的结果。
          */
 
         /**
@@ -100,8 +100,8 @@ class Promise {
             }
 
             switch (this.PromiseState) {
-                // Promise实例的执行函数是同步的，状态为resolved。
-                case 'resolved':
+                // Promise实例的执行函数是同步的，状态为fulfilled。
+                case 'fulfilled':
                     // Promise的then方法是异步执行的，回调函数执行放在定时器里面来实现。
                     setTimeout(() => { handle(onResolve) })
                     break;
@@ -125,23 +125,73 @@ class Promise {
     }
 
     catch (onReject) {
+        // 只需要调用then方法，成功回调传空即可
         return this.then(null, onReject)
     }
 
-    static resolve () {
-
+    static resolve (value) {
+        /**
+         * 返回结果为Promise实例，有两种情况：
+         * 1.参数是Promise实例，返回为这个Promise的结果；
+         * 2.参数不是Promise实例，状态为成功，结果为参数。
+         */
+        return new Promise((resolve, reject) => {
+            if (value instanceof Promise) {
+                value.then(resolve, reject)
+            } else {
+                resolve(value)
+            }
+        })
     }
 
-    static reject () {
-
+    static reject (value) {
+        /**
+         * 返回结果为Promise实例，状态为失败，结果为参数
+         */
+        return new Promise((resolve, reject) => {
+            reject(value)
+        })
     }
 
-    static all () {
-
+    static all (promises) {
+        /**
+         * 接收的参数为一个由Promise实例组成的数组
+         * 返回结果有两种情况：
+         * 1.参数中的Promise实例结果都为成功，状态为成功，并将实例终值按原顺序拼凑成一个数组，作为all返回的Promise实例终值；
+         * 2.参数中的Promise实例结果有一个失败，状态为失败，并将第一个失败的拒因，作为all返回的Promise实例据因。
+         */
+         return new Promise((resolve, reject) => {
+            let count = 0
+            const values = new Array(promises.length)
+            for (let i = 0; i < promises.length; i++) {
+                Promise.resolve(promises[i]).then(res => {
+                    count++
+                    values[i] = res
+                    console.log('count', count)
+                    if (count === promises.length) {
+                        resolve(values)
+                    }
+                }, err => {
+                    reject(err)
+                })
+            }
+        }) 
     }
 
-    static race () {
-
+    static race (promises) {
+        /**
+         * 接收的参数为一个由Promise实例组成的数组
+         * 返回一个Promise实例，结果由第一个完成的Promise实例决定
+         */
+         return new Promise((resolve, reject) => {
+            for (let i = 0; i < promises.length; i++) {
+                Promise.resolve(promises[i]).then(res => {
+                    resolve(res)
+                }, err => {
+                    reject(err)
+                })
+            }
+        })
     }
 }
 
