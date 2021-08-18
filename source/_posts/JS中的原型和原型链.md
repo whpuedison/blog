@@ -13,7 +13,7 @@ categories: javascript
 
 #### 构造函数、原型、实例的关系图
 
-![](原型图.png) 
+![](https://raw.githubusercontent.com/whpuEdison/blog/master/static/images/%E5%8E%9F%E5%9E%8B%E5%9B%BE.png)
 
 #### 为什么原型没有属性指向实例？
 
@@ -39,7 +39,7 @@ console.log(Object.prototype.__proto__ === null) // true
 
 #### 原型链关系图
 
-![](JS中的原型和原型链/原型链.png)
+![](https://raw.githubusercontent.com/whpuEdison/blog/master/static/images/%E5%8E%9F%E5%9E%8B%E9%93%BE.png)
 
 图中由相互关联的原型组成的链状结构就是原型链，也就是蓝色的这条线。
 
