@@ -1,7 +1,7 @@
 ---
 title: 手写一个Loader
 
-tags: [Loader,手写]
+tags: [Loader]
 
 categories: webpack
 ---

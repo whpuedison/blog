@@ -29,7 +29,7 @@ categories: javascript
 
 #### 原型链的尽头
 
-```
+```javascript
 console.log(Object.prototype.__proto__ === null) // true
 ```
 
@@ -49,7 +49,7 @@ console.log(Object.prototype.__proto__ === null) // true
 
 #### 实例的constructor属性指向构造函数吗？
 
-```
+```javascript
 function Person() {}
 var person = new Person();
 console.log(person.constructor === Person); // true
@@ -57,7 +57,7 @@ console.log(person.constructor === Person); // true
 
 当获取person的constructor属性时，其实 person 中并没有 constructor 属性，当不能读取到constructor 属性时，会从 person 的原型也就是 Person.prototype 中读取，正好原型中有该属性。
 
-```
+```javascript
 person.constructor === Person.prototype.constructor
 ```
 

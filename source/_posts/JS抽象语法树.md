@@ -16,7 +16,7 @@ babel是现在几乎每个项目中必备的一个东西，但是其工作原理
 
 我们可以来看一个简单的例子：
 
-```
+```javascript
 var a = 1;
 var b = a + 1;
 ```
@@ -27,7 +27,7 @@ var b = a + 1;
 
 而他的json对象格式是这样的：
 
-```
+```javascript
 {
     "type": "Program",
     "body": [
