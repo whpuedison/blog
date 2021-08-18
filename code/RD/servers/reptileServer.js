@@ -1,0 +1,25 @@
+const express = require('express')
+// superagent是一个轻量的Ajax API，服务器端（Node.js）客户端（浏览器端）均可使用
+const superagent = require('superagent')
+// nodejs的抓取页面模块，实现了核心jQuery的子集
+const cheerio = require('cheerio')
+const app = express()
+
+app.get('/', (req, res, next) => {
+    superagent.get('https://www.zhipin.com/wuhan/')
+        .end((err, data) => {
+            // 错误优先处理
+            if (err) return next(err)
+            // 将获取到dom绑定到$上，后面可以直接用$以jQuery的方式操作dom
+            const $ = cheerio.load(data.text);
+            const conpanys = []
+            $('.conpany-text').each((index, element) => {
+                conpanys.push($(element).find('h4').text())
+            });
+            res.send(conpanys)
+        })
+})
+
+app.listen('9999', () => {
+    console.log('http://localhost:9999');
+})
