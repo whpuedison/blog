@@ -1,6 +1,8 @@
 ---
 title: JS中的原型和原型链
 
+date: 2021-08-07
+
 tags: [原型,原型链]
 
 categories: javascript

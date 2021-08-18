@@ -1,6 +1,8 @@
 ---
 title: JS中的闭包
 
+date: 2021-07-29
+
 tags: [闭包]
 
 categories: javascript

@@ -1,6 +1,8 @@
 ---
 title: 手写一个Promise
 
+date: 2021-08-11
+
 tags: [Promise]
 
 categories: javascript

@@ -1,6 +1,8 @@
 ---
 title: 从输入url到页面加载完成发生了什么
 
+date: 2021-07-26
+
 tags: [页面加载]
 
 categories: 浏览器

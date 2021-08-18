@@ -1,6 +1,8 @@
 ---
 title: JS的垃圾回收机制
 
+date: 2021-07-30
+
 tags: [垃圾回收机制]
 
 categories: javascript
