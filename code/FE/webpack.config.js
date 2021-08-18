@@ -38,12 +38,12 @@ module.exports = {
   devtool: 'inline-source-map',
   devServer: {
     // host: '192.168.31.186', // home-host
-    host: '192.168.191.2', // office-host
+    host: '192.168.191.3', // office-host
     port: '8080',
     proxy: {
         '*': {
             // target: 'http://192.168.31.186:3000', // home-url
-            target: 'http://192.168.191.2:3000', // office-url
+            target: 'http://192.168.191.3:3000', // office-url
             changeOrigin: true
         }
     },

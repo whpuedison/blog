@@ -1,7 +1,7 @@
 ---
 title: 手写一个Promise
 
-tags: [Promise]
+tags: [Promise,手写]
 
 categories: javascript
 ---
