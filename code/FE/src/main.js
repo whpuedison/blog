@@ -2,4 +2,4 @@
 // require('./features/testPromis.js')
 
 // 测试防抖节流
-require('./features/testFn.js')
+require('./features/testLoader.json')

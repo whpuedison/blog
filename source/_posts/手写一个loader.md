@@ -21,7 +21,10 @@ const transformAsync = promisify(transform)
 // 校验配置
 const babelSchema = require('./schemas/babelSchema.js')
 
-// loader本质上是一个函数
+/*
+ * Loader通常是一个函数
+ * source: 对于第一个执行的loader为资源的内容，非第一个执行的loader为上一个loader的执行结果
+ *
 module.exports = function (source) {
     // 获取loader的配置
     const options = getOptions(this)
