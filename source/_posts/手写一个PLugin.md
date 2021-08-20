@@ -1,6 +1,8 @@
 ---
 title: 手写一个Plugin
 
+date: 2021-08-20
+
 tags: [plugin]
 
 categories: webpack
@@ -137,4 +139,38 @@ class CopyWebpackPlugin {
 
 module.exports = CopyWebpackPlugin
 ```
+
+
+
+###  3.调试技巧
+
+1. Package.json: 配置执行脚本
+
+``` javascript
+ "scripts": {
+    ...
+    "debug": "node --inspect-brk ./node_modules/webpack/bin/webpack.js --mode development"
+    ...
+  },
+```
+
+2. CopyWebpackPlugin.js: 在需要断点的地方添加debugger
+
+``` javascript
+ compiler.hooks.thisCompilation.tap('CopyWebpackPlugin', (compilation) => {
+     debugger
+     console.log(compilation)
+     ...
+ })
+```
+
+3. 控制台执行
+
+``` shell
+npm run debug
+```
+
+4. 打开网页 https://nodejs.org/en/docs/inspector
+
+
 
