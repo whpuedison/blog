@@ -1,9 +1,7 @@
 ---
 title: 手写一个Plugin
 
-date: 2021-08-20
-
-tags: [Plugin]
+tags: [plugin]
 
 categories: webpack
 ---

@@ -3,7 +3,7 @@ title: Loader的执行顺序
 
 date: 2021-08-19
 
-tags: [Loader]
+tags: [loader]
 
 categories: webpack
 ---
