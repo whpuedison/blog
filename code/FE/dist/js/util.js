@@ -1,0 +1,1 @@
+const add=(d,a)=>d+a;export{add};

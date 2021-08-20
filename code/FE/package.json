@@ -5,7 +5,7 @@
   "main": "demo.js",
   "scripts": {
     "dev": "webpack-dev-server --mode development",
-    "debug": "node --inspect-brk ./node_modules/webpack/bin/webpack.js",
+    "debug": "node --inspect-brk ./node_modules/webpack/bin/webpack.js --mode development",
     "build": "webpack --mode production"
   },
   "keywords": [],

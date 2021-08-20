@@ -1,7 +1,15 @@
 const globby = require('globby')
 const path = require('path')
+const fs = require('fs')
+const util = require('util')
+const webpack = require('webpack')
 
+// 将文件资源转化成webpack compilation可以识别的格式
+const { RawSource } = webpack.sources
+// 将读取文件函数基于Promise再次封装
+const readFilePromise = util.promisify(fs.readFile)
 
+// 插件都是一个类
 class CopyWebpackPlugin {
     constructor (options) {
         // 从构造函数参数中获取webpack.config.js中的配置
@@ -37,23 +45,52 @@ class CopyWebpackPlugin {
              * 事件数组执行方式：AsyncSeriesHook 串行异步
              * cb: 调用表示任务完成
              */
-            compilation.hooks.additionalAssets.tapAsync('CopyWebpackPlugin', async cb => {
-                debugger
-                console.log(compiler)
-                console.log(compilation)
-
+            compilation.hooks.additionalAssets.tapAsync('CopyWebpackPlugin', async callback => {
                 const { from, to = '', ignore } = this.options || {}
 
-                // 1.筛选需要拷贝的所有文件的绝对路径
+                // 筛选需要拷贝的所有文件的绝对路径
                 const absoluteFromPath = path.resolve(compiler.options.context, from)
-                const paths = await globby([absoluteFromPath, ignore])
-                debugger
+                /**
+                 * globby函数第一个参数是匹配的绝对路径，第二个参数是配置对象。
+                 * 下面配置了ignore属性，设置可以忽略的文件
+                 */
+                const paths = await globby(absoluteFromPath, { ignore })
                 console.log(absoluteFromPath)
 
-                // 2.将文件转成webpack能识别的格式
+                // 判断文件分类，先简单分为三类：js、css、images 
+                const judgeType = (path) => {
+                    let middle = ''
+                    if (/\.js$/.test(path)) {
+                        middle = 'js'
+                    } else if (/\.css$/.test(path)) {
+                        middle = 'css'
+                    } else if (/\w(\.gif|\.jpeg|\.png|\.jpg|\.bmp)/i.test(path)) {
+                        middle = 'image'
+                    }
+                    return middle
+                }
 
-                // 3.写入到打包文件中
-                cb()
+                try {
+                    const files = await Promise.all(
+                        // 遍历文件内容
+                        paths.map(async absolutePath => {
+                            // 获取文件内容
+                            const source = await readFilePromise(absolutePath)
+                            // 文件名称：webpack.config.js中配置的to + 文件分类 + 获取path的最后一部分
+                            const baseName = path.basename(absolutePath)
+                            const fileName = path.join(to, judgeType(absolutePath), baseName )
+                            // 将资源转成compilation可识别的格式
+                            const rawSource = new RawSource(source)
+                            // 输出文件
+                            compilation.emitAsset(fileName, rawSource)
+                        })
+                    )
+                    // 成功回调
+                    callback()
+                } catch {
+                    // 抛出异常
+                    callback(new Error('[CopyWebpackPlugin] loading error'))
+                } 
             })
         })
     }
