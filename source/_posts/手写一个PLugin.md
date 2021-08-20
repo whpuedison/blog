@@ -154,6 +154,8 @@ module.exports = CopyWebpackPlugin
   },
 ```
 
+
+
 2. CopyWebpackPlugin.js: 在需要断点的地方添加debugger
 
 ``` javascript
@@ -164,13 +166,22 @@ module.exports = CopyWebpackPlugin
  })
 ```
 
+
+
 3. 控制台执行
 
 ``` shell
 npm run debug
 ```
 
-4. 打开网页 https://nodejs.org/en/docs/inspector
+
+
+4. 打开网页:  https://nodejs.org/en/docs/inspector
+
+![img](https://raw.githubusercontent.com/whpuEdison/blog/master/static/images/node_debug.png)
 
 
 
+5. 开始调试
+
+![img](https://raw.githubusercontent.com/whpuEdison/blog/master/static/images/debugger.png)
