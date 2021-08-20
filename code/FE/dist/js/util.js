@@ -1,1 +1,5 @@
-const add=(d,a)=>d+a;export{add};
+const add = (a, b) => {
+    return a + b
+}
+
+export { add }
