@@ -1,6 +1,7 @@
 const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('./plugins/CopyWebpackPlugin.js')
 
 module.exports = {
   entry: './src/main.js',
@@ -32,11 +33,20 @@ module.exports = {
   },
 
   plugins: [
-      new CleanWebpackPlugin(),
-      new HtmlWebpackPlugin({
-        template: './src/index.html',
-        inject: 'body'
+      new CopyWebpackPlugin({
+        from: 'public',
+        to: '',
+        /**
+         * '**'可以匹配任意数量的字符，包括/
+         * 因为ignore是作为参数传给globby，所以规则在globby中定义
+         */ 
+        ignore: '**/index.html'
       }),
+      // new CleanWebpackPlugin(),
+      // new HtmlWebpackPlugin({
+      //   template: './src/index.html',
+      //   inject: 'body'
+      // }),
   ],
 
   devtool: 'inline-source-map',
