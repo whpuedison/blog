@@ -1,0 +1,22 @@
+{
+  "name": "toys_webpack",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "debug": "cross-env NODE_ENV=prod node --inspect-brk ./config/index.js ",
+    "test": "cross-env NODE_ENV=test node ./config/index.js ",
+    "prod": "cross-env NODE_ENV=prod node ./config/index.js "
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.15.0",
+    "@babel/parser": "^7.15.3",
+    "@babel/preset-env": "^7.15.0",
+    "@babel/traverse": "^7.15.0",
+    "cross-env": "^7.0.3",
+    "mkdirp": "^1.0.4"
+  }
+}
