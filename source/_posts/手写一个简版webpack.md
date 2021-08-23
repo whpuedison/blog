@@ -14,6 +14,8 @@ categories: webpack
 
 
 
+
+
 ### webpack打包流程
 
 1. 初始化Compiler:  new Webpack(config)得到Compiler对象；
@@ -22,6 +24,8 @@ categories: webpack
 4. 编译模块：从入口文件出发，调用所有配置的Loader对模块进行编译，再找出该模块依赖的模块，递归直到所有的模块都被加载；
 5. 完成模块编译：使用Loader编译完所有模块后，得到了每个模块被编译后的最终内容以及模块的依赖关系图；
 6. 输出资源：根据入口和模块之间的依赖关系，组装成一个个包含多个模块的Chunk，再把每个Chunk转换成单独的文件加入到输出列表，这步是可以修改输出内容的最后机会。
+
+
 
 
 
@@ -57,6 +61,8 @@ categories: webpack
 
 
 
+
+
 #### package.json
 
 debug - 调试脚本， test - 打测试环境包， prod - 打生产环境包
@@ -86,6 +92,8 @@ debug - 调试脚本， test - 打测试环境包， prod - 打生产环境包
 }
 
 ```
+
+
 
 
 
@@ -141,6 +149,8 @@ module.exports = {
     }
 }
 ```
+
+
 
 
 
@@ -201,6 +211,8 @@ error.js
 ``` javascript
 export const error =  console.error
 ```
+
+
 
 
 
@@ -401,6 +413,8 @@ module.exports = {
     getCode
 }
 ```
+
+
 
 
 
