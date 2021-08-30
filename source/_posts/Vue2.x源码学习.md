@@ -79,6 +79,14 @@ callHook(vm, 'created') // 执行生命周期created的回调函数
 
 Vue初始化主要干了几件事情，合并配置，初始化生命周期，初始化事件中心，初始化渲染，初始化inject、props、method、data、computed、watch、privide等等。
 
+new Vue通常有两种场景：
+
+1. 开发者主动调用new Vue(options)来实例化一个Vue对象；
+
+2. 组件内部通过new Vue(options)来实例化子组件。
+
+
+
 
 
 
@@ -478,7 +486,7 @@ new Vue 之后执行一系列的初始化操作，如合并配置，初始化生
 
 通过createComponent返回的是组件的VNode，也通过patch方法实现渲染。
 
-createComponent返回的是组件的VNode，主要有三个逻辑：
+createComponent返回的是组件的VNode，主要有三个步骤：
 
 1. 构造⼦类构造函数：使用原型继承的方式把一个纯对象转换成一个继承于Vue的构造器Sub并返回，然后对Sub本身扩展了一些属性，如options、添加全局API，并对配置中的props和computed做了初始化⼯作，最后将这个 Sub构造函数做了缓存，避免多次执⾏ Vue.extend 的时候对同⼀个⼦组件重复构造。
 2. 安装组件钩⼦函数：componentVNodeHooks的钩⼦函数合并到data.hook中，在VNode执⾏patch的过程中执⾏相关的钩⼦函数；
@@ -486,3 +494,89 @@ createComponent返回的是组件的VNode，主要有三个逻辑：
 
 
 
+
+
+#### 组件的mounted时机在哪儿？
+
+``` javascript
+// 代码来源：src/core/vdom/patch.js
+function invokeInsertHook (vnode, queue, initial) {
+    // delay insert hooks for component root nodes, invoke them after the
+    // element is really inserted
+    if (isTrue(initial) && isDef(vnode.parent)) {
+        vnode.parent.data.pendingInsert = queue
+    } else {
+        for (let i = 0; i < queue.length; ++i) {
+            queue[i].data.hook.insert(queue[i])
+        }
+    }
+}
+
+// 代码来源：src/core/vdom/create-component.js
+insert (vnode: MountedComponentVNode) {
+    const { context, componentInstance } = vnode
+    if (!componentInstance._isMounted) {
+        componentInstance._isMounted = true
+        callHook(componentInstance, 'mounted')
+    }
+    ...
+  }
+```
+
+组件的 VNode patch 到 DOM 后，会执⾏ invokeInsertHook 函数，把 insertedVnodeQueue ⾥保存的钩⼦函数依次执⾏⼀遍。该函数会执⾏ insert 这个钩⼦函数，每个⼦组件都是在这个钩⼦函数中执⾏ mouted 钩⼦函数。 insertedVnodeQueue 的添加顺序是先⼦后⽗，所以对于同步渲染的⼦组件⽽⾔， mounted 钩⼦函数的执⾏顺序也是先⼦后⽗。 
+
+
+
+
+
+
+
+#### $destroy做了哪些事情？
+
+``` javascript
+Vue.prototype.$destroy = function () {
+    const vm: Component = this
+    if (vm._isBeingDestroyed) {
+        return
+    }
+    callHook(vm, 'beforeDestroy')
+    vm._isBeingDestroyed = true
+    // remove self from parent
+    const parent = vm.$parent
+    if (parent && !parent._isBeingDestroyed && !vm.$options.abstract) {
+        remove(parent.$children, vm)
+    }
+    // teardown watchers
+    if (vm._watcher) {
+        vm._watcher.teardown()
+    }
+    let i = vm._watchers.length
+    while (i--) {
+        vm._watchers[i].teardown()
+    }
+    // remove reference from data ob
+    // frozen object may not have observer.
+    if (vm._data.__ob__) {
+        vm._data.__ob__.vmCount--
+    }
+    // call the last hook...
+    vm._isDestroyed = true
+    // invoke destroy hooks on current rendered tree
+    // 触发它⼦组件的销毁钩⼦函数，递归调⽤，执⾏顺序是先⼦后⽗，和 mounted过程⼀样。
+    vm.__patch__(vm._vnode, null)
+    // fire destroyed hook
+    callHook(vm, 'destroyed')
+    // turn off all instance listeners.
+    vm.$off()
+    // remove __vue__ reference
+    if (vm.$el) {
+        vm.$el.__vue__ = null
+    }
+    // release circular reference (#6759)
+    if (vm.$vnode) {
+        vm.$vnode.parent = null
+    }
+}
+```
+
+先执行了beforeDestroy 钩⼦函数，接着执⾏了⼀系列的销毁动作，包括从 parent 的 $children 中删掉⾃⾝，删除 watcher ，当前渲染的 VNode 执⾏销毁钩⼦函数等，执⾏完毕后再调⽤ destroy 钩⼦函数。
