@@ -32,6 +32,8 @@ Vue实际上是一个用Function实现的类，只能使用new去实例化。
 
 
 
+
+
 #### 为什么Vue要用Function去实现，而不用ES6的Class？
 
 ``` javascript
@@ -44,6 +46,8 @@ renderMixin(Vue)
 ```
 
 这些Mixin方法，都会给Vue的prototype上扩展一些方法，Vue按照功能把这些扩展放在了不同的模块。实现方式是在创建Vue实例的时候，调用这些Mixin方法，并将Vue作为参数传入。这种将原型方法放在不同的模块去扩展，用Class是难以实现的。
+
+
 
 
 
@@ -79,6 +83,8 @@ Vue初始化主要干了几件事情，合并配置，初始化生命周期，�
 
 
 
+
+
 #### 生命周期对应的回调函数是怎么执行的？
 
 ``` javascript
@@ -102,6 +108,8 @@ export function callHook (vm: Component, hook: string) {
   popTarget()
 }
 ```
+
+
 
 
 
@@ -213,6 +221,8 @@ Vue.prototype.$mount = function (
 
 
 
+
+
 #### 为什么Vue2.x组件模板只能有一个根元素？
 
 ``` javascript
@@ -234,6 +244,8 @@ if (!(vnode instanceof VNode)) {
 ```
 
 这里只从Vue2.x的源码角度，来解释为什么Vue2.x组件模板只能有一个根元素。至于为什么这么设计就不去多分析了，因为Vue3是允许一个组件是有多个根元素的。对于开发者来讲，允许多个根元素是更友好的。
+
+
 
 
 
@@ -327,6 +339,8 @@ if (typeof tag === 'string') {
 
 
 
+
+
 #### Vue2.x为什么要用Virtual DOM?
 
 ``` javascript
@@ -411,6 +425,8 @@ export default class VNode {
 
 
 
+
+
 #### VDOM是怎么渲染成DOM的？
 
 ``` javascript
@@ -446,9 +462,27 @@ Vue.prototype.__patch__ = inBrowser ? patch : noop
 
 
 
+
+
 #### 初始化Vue到最终渲染的过程是怎么样的？
 
 new Vue 之后执行一系列的初始化操作，如合并配置，初始化生命周期，初始化事件中心，初始化渲染，初始化inject、props、method、data、computed、watch、privide等等。初始化完成之后，对Vue实例进行挂载。挂载时会判断是否有render函数，如果是el和template转换成render方法，执行render方法会生成VNode tree，也就是VDOM。最后再调用patch方法，将VNode渲染成DOM并完成挂载，实际上整个渲染过程调用的就是原生的DOM API。
+
+
+
+
+
+
+
+#### Vue是怎么渲染子组件的？
+
+通过createComponent返回的是组件的VNode，也通过patch方法实现渲染。
+
+createComponent返回的是组件的VNode，主要有三个逻辑：
+
+1. 构造⼦类构造函数：使用原型继承的方式把一个纯对象转换成一个继承于Vue的构造器Sub并返回，然后对Sub本身扩展了一些属性，如options、添加全局API，并对配置中的props和computed做了初始化⼯作，最后将这个 Sub构造函数做了缓存，避免多次执⾏ Vue.extend 的时候对同⼀个⼦组件重复构造。
+2. 安装组件钩⼦函数：componentVNodeHooks的钩⼦函数合并到data.hook中，在VNode执⾏patch的过程中执⾏相关的钩⼦函数；
+3. 实例化VNode： new VNode实例化⼀个vnode并返回。
 
 
 
