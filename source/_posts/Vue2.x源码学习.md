@@ -130,7 +130,7 @@ Vue.prototype.$mount = function (
 
   const options = this.$options
   // resolve template/el and convert to render function
-  // ⚠️如果没有定义render方法，则会吧el和template转换成render方法
+  // ⚠️如果没有定义render方法，则会把el和template转换成render方法
   if (!options.render) {
     let template = options.template
     if (template) {
@@ -250,9 +250,78 @@ vm.$createElement = (a, b, c, d) => createElement(vm, a, b, c, d, true)
 vnode = render.call(vm._renderProxy, vm.$createElement)
 ```
 
-简而言之render方法主要做的事情就是将实例渲染成了一个VNode，创建VNode实际上调用的是createElement方法。
+简而言之render方法主要做的事情就是将实例渲染成了一个VNode，创建VNode实际上调用的是createElement方法。而createElement方法也只是对真正创建VNode的_createElement函数的封装，允许传入的参数更灵活。
 
 
+
+##### children的规范化
+
+``` javascript
+// 代码来源：src/core/vdom/create-element.js
+// normalizationType表示子节点规范的类型，类型不同规范的方法也不同
+// 主要的参考是render函数是编译生成的还是开发者手写的
+if (normalizationType === ALWAYS_NORMALIZE) {
+    /**
+     * 调用场景有两个：
+     * 1.render函数是用户手写的，当children只有一个节点的时候，
+     * Vue.js从接⼝层⾯允许⽤户把children写成基础类型⽤来创建单个简单的⽂本节点；
+     * 2.编译slot、v-for的时候会产生嵌套数组的情况，会调⽤normalizeArrayChildren⽅法。
+     */
+    children = normalizeChildren(children)
+} else if (normalizationType === SIMPLE_NORMALIZE) {
+    /**
+     * 调用场景是render函数是由编译生成的 。理论上编译生成的children都已经是VNode类型的，
+     * 有一个例外，函数式组件返回的是一个深度只有一层的数组而不是一个根结点，
+     * 所以会通过Array.prototype.concat⽅法将数组打平。
+     */
+    children = simpleNormalizeChildren(children)
+}
+```
+
+由于Virtual DOM实际上是一个树状结构，每一个VNode可能会有若干个子节点，这些子节点应该也是VNode类型。但是_createElement接收的第四个参数children是任意类型的，因此要将这个children规范成VNode类型的Array。
+
+
+
+##### VNode的创建
+
+``` javascript
+// 代码来源：src/core/vdom/create-element.js
+// 判断tag是否是String类型
+if (typeof tag === 'string') {
+    let Ctor
+    ns = (context.$vnode && context.$vnode.ns) || config.getTagNamespace(tag)
+    if (config.isReservedTag(tag)) {
+        // 判断如果是内置的⼀些节点，则直接创建⼀个普通VNode
+        // platform built-in elements
+        if (process.env.NODE_ENV !== 'production' && isDef(data) && isDef(data.nativeOn)) {
+            warn(`The .native modifier for v-on is only valid on components but it was used on <${tag}>.`,
+            context)
+        }
+        vnode = new VNode(
+            config.parsePlatformTagName(tag), data, children,
+            undefined, undefined, context
+            )
+    } else if ((!data || !data.pre) && isDef(Ctor = resolveAsset(context.$options, 'components', tag))) {
+        // 如果是一个已注册的组件名，则通过createComponent创建⼀个组件类型的VNode，本质上还是返回一个Vnode
+        vnode = createComponent(Ctor, data, context, children, tag)
+    } else {
+        // unknown or unlisted namespaced elements
+        // check at runtime because it may get assigned a namespace when its
+        // parent normalizes children
+        // 创建一个未知的标签的VNode
+        vnode = new VNode(
+            tag, data, children,
+            undefined, undefined, context
+        )
+    }
+} else {
+    // 如果tag是Component类型，则直接调⽤createComponent创建⼀个组件类型的VNode节点
+    // direct component options / constructor
+    vnode = createComponent(tag, data, context, children)
+}
+```
+
+无论是new VNode还是createComponent，最后返回的都是VNode类型的数据。每个VNode有children，children的每个元素又是VNode，这样就形成了一个VNode Tree，也就是传说中的Virtual DOM，用来映射构建DOM Tree。
 
 
 
@@ -342,7 +411,44 @@ export default class VNode {
 
 
 
+#### VDOM是怎么渲染成DOM的？
 
+``` javascript
+// 代码来源：src/core/instance/lifecycle.js
+if (!prevVnode) {
+    // initial render
+    // 首次渲染
+    vm.$el = vm.__patch__(vm.$el, vnode, hydrating, false /* removeOnly */)
+} else {
+    // updates
+    // 数据更新
+    vm.$el = vm.__patch__(prevVnode, vnode)
+}
+```
+
+patch方法被调用的时机有两个：首次渲染和数据更新。
+
+``` javascript
+// 代码来源：src/platforms/web/runtime/index.js
+Vue.prototype.__patch__ = inBrowser ? patch : noop
+```
+
+在源码中是使用vm._update完成的，而 _update的核心是vm.__patch__方法。patch放在在不同的平台上的定义是不一样的，在Web和Weex环境，它们把VDOM映射到平台DOM的方法是不同的，包括对属性模块的创建和更新都会有所不同。整个渲染过程，实际上就是调用原生的DOM的API来进行DOM操作。
+
+需要关注的两个函数：
+
+1. createElm的作⽤是通过虚拟节点创建真实的 DOM 并插⼊到它的⽗节点中；
+2. createChildren遍历子虚拟节点，以深度优先的算法递归调用createElm，最后再调用insert方法把dom插入到父节点中。子元素会优先调用insert方法，所以整个VNode树的插入顺序是先子后父。
+
+> tips：首次渲染的整个过程实际上就是递归创建了一个完整的DOM树并插入到Body上。
+
+
+
+
+
+#### 初始化Vue到最终渲染的过程是怎么样的？
+
+new Vue 之后执行一系列的初始化操作，如合并配置，初始化生命周期，初始化事件中心，初始化渲染，初始化inject、props、method、data、computed、watch、privide等等。初始化完成之后，对Vue实例进行挂载。挂载时会判断是否有render函数，如果是el和template转换成render方法，执行render方法会生成VNode tree，也就是VDOM。最后再调用patch方法，将VNode渲染成DOM并完成挂载，实际上整个渲染过程调用的就是原生的DOM API。
 
 
 
