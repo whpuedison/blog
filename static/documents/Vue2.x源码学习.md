@@ -534,6 +534,7 @@ insert (vnode: MountedComponentVNode) {
 #### $destroy做了哪些事情？
 
 ``` javascript
+代码来源：src/core/instance/lifecycle.js
 Vue.prototype.$destroy = function () {
     const vm: Component = this
     if (vm._isBeingDestroyed) {
@@ -580,3 +581,124 @@ Vue.prototype.$destroy = function () {
 ```
 
 先执行了beforeDestroy 钩⼦函数，接着执⾏了⼀系列的销毁动作，包括从 parent 的 $children 中删掉⾃⾝，删除 watcher ，当前渲染的 VNode 执⾏销毁钩⼦函数等，执⾏完毕后再调⽤ destroy 钩⼦函数。
+
+
+
+
+
+
+
+#### Vue是怎么实现双向绑定的？
+
+
+
+
+
+从初始化数据initState说起，在initData中将options里面的data作为参数传给observe。
+
+
+
+observe中判断data是不是对象或者VNode，只有这两种情况才会通过new Observer(data)得方式将data作为观察者。
+
+
+
+Observer的构造函数中，将数组和对象作为两种情况来处理，接下来只分析对象的情况。当观察者是一个对象的时候，调用walk方法遍历对象属性，传递给defineReactive函数，将data属性转换为可访问属性，后续对该属性取值或者赋值都会走到get或set方法。需要注意，这个时候get方法和set方法都还没有执行。
+
+
+
+defineReactive函数中做了递归，将属性值作为参数传给了observe，以这种深度优先的算法方式实现了对象所以属性的数据劫持。当数据初始化完成后，开始对Vue实例进行挂载。
+
+
+
+在组件挂载时，创建了一个watcher实例。第二个参数为渲染DOM的函数。watcher的构造函数中，如果不是lazy型的watcher都会执行实例的get方法。在get方法中，将全局的Dep.target赋值为当前的watcher。在这种渲染watcher的情况下，会开始执行渲染dom的函数。在创建真实dom的时候，需要获取当前dom用到的值，会触发get方法。
+
+
+
+
+
+
+
+
+
+
+
+依赖收集：
+
+在Vue的使用过程中会发现，下面的3个场景中Vue内部做的一些事情极大的提高开发效率。
+
+场景1:在模版上使用了props、data里的属性，属性值发生变化的时候，无需手动操作DOM，模版会自动更新；
+
+场景2:在组件中使用了computed，属性在被使用时会去执行对应的计算函数；
+
+场景3:在组件中使用了watch，属性值发生变化时，会执行对应的回调函数。
+
+这三个场景分别对应的是监听器watcher的三种类型：render watcher、computed watcher、user watcher。
+
+执行顺序是computed watcher -> user watcher ->render watcher。
+
+
+
+要满足上面三个场景，就需要做到数据变化时去通知跟这个数据相关的监听器，也就是后面会聊到的派发更新。而要做到派发更新的前提，就是要将数据和监听器关联起来，也就是所谓的依赖收集。
+
+在初始化数据的时候，如果组件中有使用computed，会执行一个initComputed方法来初始化computed。为computed的属性都创建一个computed watcher，computed watcher是惰性的，初始化的时候是不会立即执行computed的计算函数。当属性值被使用时，会触发computed watcher的get方法，将当前的watcher赋值给Dep构造函数作为静态属性，然后会执行计算函数，在计算函数中需要获取到依赖属性的值，这就触发了依赖属性的get方法，在get方法中当前属性的dep依赖收集器去执行depend方法，触发当前的watcher实例的addDep方法，将依赖收集器信息存储于实例属性中，并回调dep.addSub方法来为dep添加watcher。当computed计算函数执行完之后，将删除targetStack最后一项，target取最后一个。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
