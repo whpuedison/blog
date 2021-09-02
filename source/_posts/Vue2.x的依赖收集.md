@@ -30,11 +30,11 @@ Vue是一个实现了数据驱动的框架， 当数据改变的时候，需要�
 
 当后面使用到computed属性时，如template模版中第一次使用到计算属性，会执行computed对应watcher的get方法。
 
-在这里插入对依赖管理器的介绍，帮助理解后续的过程。对于每一个被用到的响应式数据，都需要有一个dep实例来管理依赖这个数据的watcher。构造函数Dep有一个静态属性target可以理解成一个全局变量，当开始当前watcher的依赖收集的时候，就将当前依赖收集的watcher赋值给target。当结束当前watcher的依赖收集的时候，将target赋值为watcher栈里的最上层的一个watcher。从上面的描述中可以看出，在做依赖收集的时候，是按watcher顺序执行来完成依赖收集的。
+在这里插入对依赖管理器的介绍，帮助理解后续的过程。对于每一个被用到的响应式数据，都需要有一个dep实例来管理依赖这个数据的watcher。构造函数Dep有一个静态属性target，可以理解成一个全局变量，开始当前watcher的依赖收集的时候，就将当前依赖收集的watcher赋值给target。结束当前watcher的依赖收集的时候，将target赋值为watcher栈里的最上层的一个watcher。从上面的描述中可以看出，在做依赖收集的时候，是按watcher顺序执行来完成依赖收集的。
 
 在get方法中会将当前的watcher压入watcher栈中，并将依赖管理器Dep的静态属性target赋值为当前watcher。然后执行当前watcher实例的getter方法，也就是computed属性对应的计算方法，里面涉及到对响应式数据的取值操作，就会执行数据的getter方法（为了跟前面的get方法区别开，使用getter）。
 
-这里注意一下响应式数据，在执行initComputed之前，props和data都是已经被数据劫持过的，使用的是Object.defineProperty方法。所以在对响应式数据取值的时候，才会执行数据的getter方法。
+这里注意一下响应式数据，在执行initComputed之前，数据都是已经被数据劫持过的，使用的是Object.defineProperty方法。所以在对响应式数据取值的时候，才会执行数据的getter方法。
 
 在getter方法中，除了取值还做了依赖收集的工作。判断Dep.target是否存在，如果存在就执行dep实例的depend方法，而dep.depend方法中调用的是当前watcher的addDep方法。
 
@@ -49,9 +49,9 @@ watcher.addDep执行完成后，接着执行computed属性对应的计算方法�
 
 
 
-#####user watcher
+##### user watcher
 
-在初始化数据的时候， 如果组件中有使用watch监听属性，会执行initWatch方法，一个computed属性对应生成一个user watcher。创建user watcher实例之后，会马上执行实例的get方法。
+在初始化数据的时候， 如果组件中有使用watch监听属性，会执行initWatch方法，一个watch属性对应生成一个user watcher。创建user watcher实例之后，会马上执行实例的get方法。
 
 在get方法中也会将当前的watcher压入watcher栈中，并将依赖管理器Dep的静态属性target赋值为当前watcher。
 
@@ -59,7 +59,7 @@ watcher.addDep执行完成后，接着执行computed属性对应的计算方法�
 
 在getter方法中，除了取值还做了依赖收集的工作。判断Dep.target是否存在，如果存在就执行dep实例的depend方法，而dep.depend方法中调用的是当前watcher的addDep方法。
 
-因为在前面的get方法中完成了computed watcher的压栈，所以这个时候的Dep.target是存在的，且值为user watcher，会顺利执行到当前watcher的addDep方法。
+因为在前面的get方法中完成了user watcher的压栈，所以这个时候的Dep.target是存在的，且值为user watcher，会顺利执行到当前watcher的addDep方法。
 
 在watcher.addDep方法中做了两件事，通过id来避免了重复收集：
 
@@ -72,7 +72,7 @@ watcher.addDep执行完成后，将当前的watcher出栈。最后也是完成�
 
 ##### render watcher
 
-初始化数据完成之后，对Vue实例进行挂载。将VNode渲染成DOM的方法作为创建watcher的第二个参数，创建了一个render watcher，一个组件对应一个render watcher。创建render watcher实例之后，会马上执行实例的get方法。
+初始化数据完成之后，对Vue实例进行挂载。将VNode渲染成DOM的方法作为创建watcher的第二个参数，创建了一个render watcher，一个组件实例对应一个render watcher。创建render watcher实例之后，会马上执行实例的get方法。
 
 在get方法中也会将当前的watcher压入watcher栈中，并将依赖管理器Dep的静态属性target赋值为当前watcher。
 
@@ -80,7 +80,7 @@ watcher.addDep执行完成后，将当前的watcher出栈。最后也是完成�
 
 在getter方法中，除了取值还做了依赖收集的工作。判断Dep.target是否存在，如果存在就执行dep实例的depend方法，而dep.depend方法中调用的是当前watcher的addDep方法。
 
-因为在前面的get方法中完成了computed watcher的压栈，所以这个时候的Dep.target是存在的，且值为user watcher，会顺利执行到当前watcher的addDep方法。
+因为在前面的get方法中完成了render watcher的压栈，所以这个时候的Dep.target是存在的，且值为user watcher，会顺利执行到当前watcher的addDep方法。
 
 在watcher.addDep方法中做了两件事，通过id来避免了重复收集：
 
