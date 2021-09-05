@@ -15,11 +15,27 @@ module.exports = {
       { 
         test: /\.js$/, 
         use: { 
-          loader: 'babelParse.js', 
+          // loader: 'babelParse.js', 
+          // options: {
+          //   presets: ['@babel/preset-env']
+          // }
+          loader: 'babel-loader', 
           options: { 
-            presets: ['@babel/preset-env'] 
+            "presets": [
+              ["@babel/preset-env", {
+              "useBuiltIns": "usage",
+              "corejs": {
+                "version": 3
+              },
+              "targets": {
+                "chrome": "60"
+              },
+              "modules": "commonjs"
+            }]
+            ] 
           } 
-        }
+        },
+        include: path.resolve(__dirname, 'src')
       },
       { 
         test: /\.json$/, 
@@ -43,10 +59,10 @@ module.exports = {
         ignore: '**/index.html'
       }),
       // new CleanWebpackPlugin(),
-      // new HtmlWebpackPlugin({
-      //   template: './src/index.html',
-      //   inject: 'body'
-      // }),
+      new HtmlWebpackPlugin({
+        template: './src/index.html',
+        inject: 'body'
+      }),
   ],
 
   devtool: 'inline-source-map',
@@ -64,5 +80,7 @@ module.exports = {
     open: true,
     hot: true,
     inline: true
-  }
+  },
+
+  devtool: "source-map"
 };
